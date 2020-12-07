@@ -6,7 +6,9 @@
       <router-link to="/posts">Posts</router-link> |
       <router-link to="/posts/create">Post create</router-link> |
       <router-link to="/posts/1">Post 1 details</router-link> |
-      <router-link to="/posts/edit/2">Post 2 edit</router-link>
+      <router-link to="/posts/edit/2">Post 2 edit</router-link> |
+      <router-link to="/users">Users</router-link> |
+      <router-link to="/users/profile">User Profile</router-link>
     </div>
     <router-view/>
   </div>

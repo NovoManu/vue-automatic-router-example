@@ -31,14 +31,60 @@ const generateRoute = path => {
   return path.map(p => p.toLowerCase()).join('/')
 }
 
+const childrenFilter = p => ~p.indexOf('^')
+
+const childrenByPath = pages
+  // Note: filter pages by children routes
+  .filter(path => path.some(childrenFilter))
+  .map(path => {
+    // Note: copy path and remove special char ^
+    const copy = [...path]
+    copy[copy.length - 1] = copy[copy.length - 1].slice(1)
+    // Note: generate key to identify parent
+    const key = `/${generateRoute(copy.slice(0, copy.length - 1))}`
+    return {
+      path,
+      route: `/${generateRoute(copy)}`,
+      key
+    }
+  })
+  .reduce((acc, cur) => {
+    // Note: generate list of nested routes where key is the parent path
+    const key = cur.key
+    delete cur.key
+    if (acc[key]) {
+      acc[key].push(cur)
+    } else {
+      acc[key] = [cur]
+    }
+    return acc
+  }, {})
+
 export default pages
+  // Note: remove nested routes from pages
+  .filter(path => !path.some(childrenFilter))
   .map(async path => {
     const { default: component } = await import(`../views/${path.join('/')}`)
     const { name } = component
     const route = `/${generateRoute([...path])}`
+    let children = []
+    if (childrenByPath[route]) {
+      const promises = childrenByPath[route].map(async ({ path, route }) => {
+        const { default: childComponent } =
+          await import(`../views/${path.join('/')}`)
+        const { name: childName } = childComponent
+        return {
+          path: route,
+          name: childName,
+          component: childComponent,
+        }
+      })
+      children = await Promise.all(promises)
+    }
     return {
       path: route,
       name,
-      component
+      component,
+      children
     }
   })
