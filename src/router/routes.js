@@ -60,23 +60,33 @@ const childrenByPath = pages
     return acc
   }, {})
 
+const defaultLayout = 'AppDefaultLayout'
+
 export default pages
   // Note: remove nested routes from pages
   .filter(path => !path.some(childrenFilter))
   .map(async path => {
     const { default: component } = await import(`../views/${path.join('/')}`)
-    const { name } = component
+    const { layout, middlewares, name } = component
     const route = `/${generateRoute([...path])}`
     let children = []
     if (childrenByPath[route]) {
       const promises = childrenByPath[route].map(async ({ path, route }) => {
         const { default: childComponent } =
           await import(`../views/${path.join('/')}`)
-        const { name: childName } = childComponent
+        const {
+          layout: childLayout,
+          middlewares: childMiddleware,
+          name: childName
+        } = childComponent
         return {
           path: route,
           name: childName,
           component: childComponent,
+          meta: {
+            layout: childLayout || defaultLayout,
+            middlewares: childMiddleware || {}
+          }
         }
       })
       children = await Promise.all(promises)
@@ -85,6 +95,10 @@ export default pages
       path: route,
       name,
       component,
+      meta: {
+        layout: layout || defaultLayout,
+        middlewares: middlewares || {}
+      },
       children
     }
   })
