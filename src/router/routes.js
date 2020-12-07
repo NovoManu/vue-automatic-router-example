@@ -5,10 +5,24 @@ const importAll = r => r.keys()
 const pages = importAll(require.context('../views', true, /\.vue$/))
 
 const generateRoute = path => {
-  const shortcut = path[0].toLowerCase()
-  return shortcut.startsWith('index')
-    ? '/'
-    : path.map(p => p.toLowerCase()).join('/')
+  // Note: remove first element if route starts with index
+  if (path[0].toLowerCase().startsWith('index') && path.length > 1) {
+    path.shift()
+  }
+  // Note: handle root routes
+  if (path.length === 1) {
+    const shortcut = path[0].toLowerCase()
+    return shortcut.startsWith('index')
+      ? ''
+      : shortcut
+  }
+  // Note: handle other routes
+  const lastElement = path[path.length - 1]
+  // Note: remove last element in array if it is index
+  if (lastElement.toLowerCase().startsWith('index')) {
+    path.pop()
+  }
+  return path.map(p => p.toLowerCase()).join('/')
 }
 
 export default pages
