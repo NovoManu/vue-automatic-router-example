@@ -4,7 +4,9 @@
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link> |
       <router-link to="/posts">Posts</router-link> |
-      <router-link to="/posts/create">Post create</router-link>
+      <router-link to="/posts/create">Post create</router-link> |
+      <router-link to="/posts/1">Post 1 details</router-link> |
+      <router-link to="/posts/edit/2">Post 2 edit</router-link>
     </div>
     <router-view/>
   </div>

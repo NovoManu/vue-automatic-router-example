@@ -14,13 +14,19 @@ const generateRoute = path => {
     const shortcut = path[0].toLowerCase()
     return shortcut.startsWith('index')
       ? ''
-      : shortcut
+      // Note: handle dynamic routes
+      : shortcut.startsWith('_')
+        ? shortcut.replace('_', ':')
+        : shortcut;
   }
   // Note: handle other routes
   const lastElement = path[path.length - 1]
   // Note: remove last element in array if it is index
   if (lastElement.toLowerCase().startsWith('index')) {
     path.pop()
+    // Note: handle dynamic routes
+  } else if (lastElement.startsWith('_')) {
+    path[path.length - 1] = lastElement.replace('_', ':');
   }
   return path.map(p => p.toLowerCase()).join('/')
 }
